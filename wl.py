@@ -4,6 +4,7 @@ import argparse
 import shelve
 import yfinance as yf # type: ignore
 import datetime as dt
+import pandas as pd
 
 from pprint import pformat
 from dataclasses import dataclass
@@ -52,6 +53,14 @@ def dump_stale_tickers(stale_tickers: dict[str, StaleTicker]) -> None:
         for sym, data in stale_tickers.items():
             db[sym] = data
 
+def is_support(history: pd.DataFrame, zone: Zone) -> bool:
+    for i in range(-1, -len(history) - 1, -1):
+        if history['Close'].iloc[i] > zone.top:
+            return True
+        elif history['Close'].iloc[i] < zone.bottom:
+            return False
+    return False
+
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument(
@@ -70,6 +79,13 @@ def main() -> None:
         type=float,
         default=0.05,
         help="Maximum percent distance from the top of the zone"
+    )
+    parser.add_argument(
+        "-s",
+        "--stale-timeout",
+        type=int,
+        default=2,
+        help="Stale timeout in weeks"
     )
     args = parser.parse_args()
 
@@ -142,15 +158,18 @@ def main() -> None:
             logging.info(
                 f"delta for {sym} in zone {zone.top}-{zone.bottom}: {delta}")
 
-            if delta < 0:
-                continue
-
-            pct = delta / ath
-            logging.info(
-                f"percent distance for {sym} in zone "
-                f"{zone.top}-{zone.bottom}: {pct}"
-            )
-            if pct <= args.percent_distance:
+            if delta > 0:
+                pct = delta / ath
+                logging.info(
+                    f"percent distance for {sym} in zone "
+                    f"{zone.top}-{zone.bottom}: {pct}"
+                )
+                if pct <= args.percent_distance:
+                    stale_tickers[sym].last_seen = dt.datetime.now()
+                    print(sym)
+            elif current_price > zone.bottom \
+                and current_price <= zone.top \
+                and is_support(data.yf_ticker.history(period='max'), zone):
                 stale_tickers[sym].last_seen = dt.datetime.now()
                 print(sym)
 

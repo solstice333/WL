@@ -74,7 +74,12 @@ def main() -> None:
     parser.add_argument(
         "--tickers-file",
         default="tickers.json",
-        help="Path to the tickers JSON file"
+        help="Path to the tickers JSON file. Schema is a dictionary with "
+             "ticker symbols as keys and their corresponding data as values. "
+             "The data is a list of zones. Each zone is represented as a "
+             "dictionary with 'top' and 'bottom' keys. The values bound to "
+             "these keys should be floating-point numbers. See tickers.json "
+             "for an example."
     )
     parser.add_argument(
         '--verbose',

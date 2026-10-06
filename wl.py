@@ -62,7 +62,15 @@ def is_support(history: pd.DataFrame, zone: Zone) -> bool:
     return False
 
 def main() -> None:
-    parser = argparse.ArgumentParser()
+    parser = argparse.ArgumentParser(
+        description="Remind user to update technical analysis bound to "
+                    "watchlist tickers. That is, when a ticker goes \"stale\", "
+                    "notify the user. A ticker is stale when its price is "
+                    "either close to a support zone, in the middle of a "
+                    "support zone, or price action has breached the previous "
+                    "all time high for --stale-timeout weeks.",
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter
+    )
     parser.add_argument(
         "--tickers-file",
         default="tickers.json",

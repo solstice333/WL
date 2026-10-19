@@ -150,7 +150,7 @@ def main() -> None:
                     auto_adjust=False
                 )['High'].max()
             )
-            ath = max(ath1, ath2)
+            ath = min(ath1, ath2)
             stale_tickers[sym] = StaleTicker(
                 last_seen=dt.datetime.now(),
                 all_time_high=ath

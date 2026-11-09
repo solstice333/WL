@@ -186,11 +186,13 @@ def main() -> None:
                 if pct <= args.percent_distance:
                     stale_tickers[sym].last_seen = dt.datetime.now()
                     print(sym)
+                    break
             elif current_price > zone.bottom \
                 and current_price <= zone.top \
                 and is_support(data.yf_ticker.history(period='max'), zone):
                 stale_tickers[sym].last_seen = dt.datetime.now()
                 print(sym)
+                break
 
     dump_stale_tickers(stale_tickers)
 

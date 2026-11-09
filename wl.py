@@ -29,10 +29,16 @@ def decode(o: dict[str, Any]) -> Zone | dict[str, Any]:
     match o:
         case {"top": float(top), "bottom": float(bottom)}:
             return Zone(top=top, bottom=bottom)
+        case {"top": int(top), "bottom": int(bottom)}:
+            return Zone(top=float(top), bottom=float(bottom))
+        case {"top": int(top), "bottom": float(bottom)}:
+            return Zone(top=float(top), bottom=float(bottom))
+        case {"top": float(top), "bottom": int(bottom)}:
+            return Zone(top=float(top), bottom=float(bottom))
         case {"bottom": float(bottom)}:
-            return o
+            assert False, f"Zone must have both 'top' and 'bottom': {o}"
         case {"top": float(top)}:
-            return o
+            assert False, f"Zone must have both 'top' and 'bottom': {o}"
         case _:
             for k, v in o.items():
                 assert isinstance(v, list), \
